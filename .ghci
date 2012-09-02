@@ -1,0 +1,7 @@
+:set -isrc -idist/build/autogen
+:set -Wall 
+:l Pin
+:m + Pin
+:set prompt ">> "
+
+
