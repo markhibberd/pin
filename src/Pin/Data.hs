@@ -1,24 +1,9 @@
 module Pin.Data where
 
+import Data.Text
 
-data PinRequest =
-  PinRequest {
-      pinAmount :: Int -- FIX Data.Fixed
-    , pinDescription :: String
-    , pinEmail :: String
-    , pinIp :: String
-    , pinNumber :: String
-    , pinExpiryMonth :: Int
-    , pinExpiryYear :: Int
-    , pinCvc :: Int
-    , pinName :: String
-    , pinAddress1 :: String
-    , pinAddress2 :: String
-    , pinCity :: String
-    , pinPostcode :: String
-    , pinState :: String
-    , pinCountry :: String
-    }
+
+-- FIX de-dupe address details etc...
 
 {--
 Request
@@ -40,6 +25,30 @@ curl https://api.pin.net.au/1/charges \
 -d "card[address_state]=WA" \
 -d "card[address_country]=AU"
 
+--}
+
+type PinAmount = Int -- Amount in cents
+
+data PinRequest =
+  PinRequest {
+      pinAmount :: PinAmount
+    , pinDescription :: Text
+    , pinEmail :: Text
+    , pinIp :: Text
+    , pinNumber :: Text
+    , pinExpiryMonth :: Int
+    , pinExpiryYear :: Int
+    , pinCvc :: Int
+    , pinName :: Text
+    , pinAddress1 :: Text
+    , pinAddress2 :: Text
+    , pinCity :: Text
+    , pinPostcode :: Text
+    , pinState :: Text
+    , pinCountry :: Text
+    }
+
+{--
 Response
 
 {
@@ -67,7 +76,30 @@ Response
 
 --}
 
+data PinResponse =
+  PinResponse {
+      pinResponseToken :: Text
+    , pinResponseResult :: Bool
+    , pinResponseAmount :: PinAmount
+    , pinResponseDescription :: Text
+    , pinResponseEmail :: Text
+    , pinResponseIp :: Text
+    , pinResponseTimestamp :: Text
+    , pinResponseCard :: PinCard
+    }
 
+data PinCard =
+  PinCard {
+      pinCardToken :: Text
+    , pinCardDisplayNumber :: Text
+    , pinCardScheme :: Text
+    , pinCardAddress1 :: Text
+    , pinCardAddress2 :: Text
+    , pinCardCity :: Text
+    , pinCardPostcode :: Text
+    , pinCardState :: Text
+    , pinCardCountry :: Text
+    }
 
 
 
