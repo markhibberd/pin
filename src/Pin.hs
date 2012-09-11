@@ -10,5 +10,7 @@
 module Pin (module X) where
 
 import Pin.Core as X
+import Pin.Data as X
+import Pin.Defaults as X
 
 
