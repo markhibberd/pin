@@ -29,6 +29,16 @@ curl https://api.pin.net.au/1/charges \
 
 type PinAmount = Int -- Amount in cents
 
+
+data PinAddress =
+  PinAddress {
+      pinAddress1 :: Text
+    , pinAddress2 :: Text
+    , pinCity :: Text
+    , pinPostcode :: Text
+    , pinState :: Text
+    , pinCountry :: Text
+    }
 data PinRequest =
   PinRequest {
       pinAmount :: PinAmount
@@ -40,12 +50,7 @@ data PinRequest =
     , pinExpiryYear :: Int
     , pinCvc :: Int
     , pinName :: Text
-    , pinAddress1 :: Text
-    , pinAddress2 :: Text
-    , pinCity :: Text
-    , pinPostcode :: Text
-    , pinState :: Text
-    , pinCountry :: Text
+    , pinAddress :: PinAddress
     }
 
 {--
@@ -93,12 +98,7 @@ data PinCard =
       pinCardToken :: Text
     , pinCardDisplayNumber :: Text
     , pinCardScheme :: Text
-    , pinCardAddress1 :: Text
-    , pinCardAddress2 :: Text
-    , pinCardCity :: Text
-    , pinCardPostcode :: Text
-    , pinCardState :: Text
-    , pinCardCountry :: Text
+    , pinCardAddress :: PinAddress
     }
 
 
