@@ -2,8 +2,6 @@ module Pin.Data where
 
 import Data.Text
 
-
-
 {--
 Request
 
@@ -28,7 +26,6 @@ curl https://api.pin.net.au/1/charges \
 
 type PinAmount = Int -- Amount in cents
 
-
 data PinAddress =
   PinAddress {
       pinAddress1 :: Text
@@ -38,6 +35,7 @@ data PinAddress =
     , pinState :: Text
     , pinCountry :: Text
     }
+
 data PinRequest =
   PinRequest {
       pinAmount :: PinAmount
@@ -99,6 +97,4 @@ data PinCard =
     , pinCardScheme :: Text
     , pinCardAddress :: PinAddress
     }
-
-
 
