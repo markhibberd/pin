@@ -3,7 +3,6 @@ module Pin.Data where
 import Data.Text
 
 
--- FIX de-dupe address details etc...
 
 {--
 Request
