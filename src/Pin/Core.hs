@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Pin.Core where
+module Pin.Core (charge) where
 
 import Control.Monad
 import qualified Data.ByteString               as B
@@ -19,13 +19,38 @@ import Pin.Data
 charge :: PinRequest -> IO PinResponse
 charge req =
   parseUrl (unpack $ "https://api.pin.net.au/1/charges") >>= \url ->
-  (liftM responder . withManager . httpLbs) (url {
-      method = "GET" -- really? how dodgy are these guys?
+  (liftM responder . withManager . httpLbs) (urlEncodedBody (params req) $ url {
+      method = "POST"
     , requestHeaders = [
       ("Accept", "application/json")
     ]
     , checkStatus = const . const $ Nothing
   })
+
+params :: PinRequest -> [(B.ByteString, B.ByteString)]
+params r = [
+    ("amount", fromInt . pinAmount $ r)
+  , ("description", fromText . pinDescription $ r)
+  , ("email", fromText . pinEmail $ r)
+  , ("ip_address", fromText . pinIp $ r)
+  , ("card[number]", fromText . pinNumber $ r)
+  , ("card[expiry_month]", fromInt . pinExpiryMonth $ r)
+  , ("card[expiry_year]", fromInt . pinExpiryYear $ r)
+  , ("card[cvc]", fromInt . pinCvc $ r)
+  , ("card[name]", fromText . pinName $ r)
+  , ("card[address_line1]", fromText . pinAddress1 . pinAddress $ r)
+  , ("card[address_line2]", fromText . pinAddress2 . pinAddress $ r)
+  , ("card[address_city]", fromText . pinCity . pinAddress $ r)
+  , ("card[address_postcode]", fromText . pinPostcode . pinAddress $ r)
+  , ("card[address_state]", fromText . pinState . pinAddress $ r)
+  , ("card[address_country]", fromText . pinCountry . pinAddress $ r)
+  ]
+
+fromInt :: Int -> B.ByteString
+fromInt = fromText . pack . show
+
+fromText :: Text -> B.ByteString
+fromText = encodeUtf8
 
 responder :: Response BL.ByteString -> PinResponse
 responder = undefined
