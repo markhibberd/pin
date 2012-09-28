@@ -45,4 +45,5 @@ Library
                     Pin.Core
                     Pin.Data
                     Pin.Defaults
+                    Pin.Network
 

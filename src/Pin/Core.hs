@@ -2,11 +2,8 @@
 module Pin.Core (charge) where
 
 import Control.Monad
-import Control.Monad.IO.Class
-import Control.Monad.Trans.Resource
 
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as B8
 import qualified Data.ByteString.Lazy as BL
 import Data.Attoparsec.Lazy
 import Data.Aeson
@@ -17,30 +14,21 @@ import qualified Data.Text.Lazy.Encoding as LE
 
 import Network.HTTP.Conduit
 import Network.HTTP.Types
-import Network.TLS (TLSCertificateUsage)
-import Network.TLS.Extra (certificateVerifyChain, certificateVerifyDomain)
-import Data.Certificate.X509 (X509)
+
 import Pin.Data
+import Pin.Network
 
 --charge :: PinRequest -> IO PinResponse
 charge :: Text -> PinRequest -> IO Text
 charge key req =
   parseUrl (unpack $ "https://test-api.pin.net.au/1/charges") >>= \url ->
-  (liftM responder . withManager' (def { managerCheckCerts = verify } ) . httpLbs) (applyBasicAuth (fromText key) "" $ urlEncodedBody (params req) $ url {
+  (liftM responder . withCustomManager (def { managerCheckCerts = checkDomainOnly } ) . httpLbs) (applyBasicAuth (fromText key) "" $ urlEncodedBody (params req) $ url {
       method = "POST"
     , requestHeaders = [
       ("Accept", "application/json")
     ]
     , checkStatus = const . const $ Nothing
   })
-
-verify :: B8.ByteString -> [X509] -> IO TLSCertificateUsage
-verify host' certs = return $ certificateVerifyDomain (B8.unpack host') certs
-
-withManager' :: (MonadIO m, MonadBaseControl IO m, MonadThrow m, MonadUnsafeIO m) => ManagerSettings -> (Manager -> ResourceT m a) -> m a
-withManager' settings f = runResourceT $ do
-    (_, manager) <- allocate (newManager settings) closeManager
-    f manager
 
 params :: PinRequest -> [(B.ByteString, B.ByteString)]
 params r = [
