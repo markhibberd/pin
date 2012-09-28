@@ -85,9 +85,9 @@ responder (Response status _ _ body) =
       withJson 200 body (\(PinResponseSuccessData t r a d e ip ts c) -> PinResponseSuccess t r a d e ip ts c)
     (Status 401 _) ->
       PinResponseUnauthorized
+    (Status 422 _) ->
+      withJson 422 body (\(PinResponseUnproccessibleData e d ms) -> PinResponseUnproccessible e d ms)
     (Status 500 _) ->
       PinResponseServerError bt
     (Status c _) ->
       PinResponseInvalidResponseCode c bt
-
-    -- FIX detect normal client/card failure

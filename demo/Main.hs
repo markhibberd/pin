@@ -13,4 +13,7 @@ main =
 
 main' :: String -> IO ()
 main' key =
-  demoCharge (pack key) >>= print
+  putStrLn "Successfull charge ==" >>
+  demoCharge (pack key) >>= print >>
+  putStrLn "Failed charge ==" >>
+  demoFailure (pack key) >>= print
