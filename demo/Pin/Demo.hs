@@ -4,7 +4,7 @@ module Pin.Demo where
 import Pin
 import Data.Text
 
-demoCharge :: Text -> IO Text
+demoCharge :: Text -> IO PinResponse
 demoCharge key =
   charge key (PinRequest {
       pinAmount = 400
@@ -18,7 +18,7 @@ demoCharge key =
     , pinName = "Roland Robot"
     , pinAddress = PinAddress {
         pinAddress1 = "42 Sevenoaks St"
-      , pinAddress2 = ""
+      , pinAddress2 = Nothing
       , pinCity = "Lathlain"
       , pinPostcode = "6454"
       , pinState = "WA"

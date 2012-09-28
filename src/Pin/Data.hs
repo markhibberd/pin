@@ -1,5 +1,8 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Pin.Data where
 
+import Control.Applicative
+import Data.Aeson
 import Data.Text
 
 {--
@@ -29,12 +32,13 @@ type PinAmount = Int -- Amount in cents
 data PinAddress =
   PinAddress {
       pinAddress1 :: Text
-    , pinAddress2 :: Text
+    , pinAddress2 :: Maybe Text
     , pinCity :: Text
     , pinPostcode :: Text
     , pinState :: Text
     , pinCountry :: Text
     }
+  deriving (Show)
 
 data PinRequest =
   PinRequest {
@@ -79,16 +83,34 @@ Response
 --}
 
 data PinResponse =
-  PinResponse {
-      pinResponseToken :: Text
-    , pinResponseResult :: Bool
-    , pinResponseAmount :: PinAmount
-    , pinResponseDescription :: Text
-    , pinResponseEmail :: Text
-    , pinResponseIp :: Text
-    , pinResponseTimestamp :: Text
-    , pinResponseCard :: PinCard
-    }
+    PinResponseSuccess {
+        pinResponseToken :: Text
+      , pinResponseResult :: Bool
+      , pinResponseAmount :: PinAmount
+      , pinResponseDescription :: Text
+      , pinResponseEmail :: Text
+      , pinResponseIp :: Text
+      , pinResponseTimestamp :: Text
+      , pinResponseCard :: PinCard
+      }
+  | PinResponseUnauthorized
+  | PinResponseClientError Text
+  | PinResponseServerError Text
+  | PinResponseInvalidResponseCode Int Text
+  | PinResponseJsonSyntaxError Int Text Text
+  | PinResponseJsonFormatError Int Text Text
+  deriving (Show)
+
+data PinResponseSuccessData =
+  PinResponseSuccessData
+    Text
+    Bool
+    PinAmount
+    Text
+    Text
+    Text
+    Text
+    PinCard
 
 data PinCard =
   PinCard {
@@ -97,4 +119,39 @@ data PinCard =
     , pinCardScheme :: Text
     , pinCardAddress :: PinAddress
     }
+  deriving (Show)
 
+instance FromJSON PinResponseSuccessData where
+  parseJSON (Object o) =
+    o .: "response" >>= \response -> case response of
+      (Object oo) -> PinResponseSuccessData
+        <$> oo .: "token"
+        <*> oo .: "success"
+        <*> oo .: "amount"
+        <*> oo .: "description"
+        <*> oo .: "email"
+        <*> oo .: "ip_address"
+        <*> oo .: "created_at"
+        <*> parseJSON response
+      _ -> fail "Invalid PinCard.response"
+  parseJSON _ = fail "Invalid PinCard"
+
+
+instance FromJSON PinAddress where
+  parseJSON (Object o) = PinAddress
+    <$> o .: "address_line1"
+    <*> o .: "address_line2"
+    <*> o .: "address_city"
+    <*> o .: "address_postcode"
+    <*> o .: "address_state"
+    <*> o .: "address_country"
+  parseJSON _ = fail "Invalid PinCard"
+
+
+instance FromJSON PinCard where
+  parseJSON o'@(Object o) = PinCard
+    <$> o .: "token"
+    <*> o .: "display_number"
+    <*> o .: "scheme"
+    <*> parseJSON o'
+  parseJSON _ = fail "Invalid PinCard"
