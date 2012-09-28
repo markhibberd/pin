@@ -1,6 +1,27 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Pin.Demo where
 
 import Pin
+import Data.Text
 
-runbletch :: Int
-runbletch = bletch 5
+demoCharge :: Text -> IO Text
+demoCharge key =
+  charge key (PinRequest {
+      pinAmount = 400
+    , pinDescription = "test charge"
+    , pinEmail = "roland@pin.net.au"
+    , pinIp = "203.192.1.172"
+    , pinNumber = "5520000000000000"
+    , pinExpiryMonth = 05
+    , pinExpiryYear = 2013
+    , pinCvc = 519
+    , pinName = "Roland Robot"
+    , pinAddress = PinAddress {
+        pinAddress1 = "42 Sevenoaks St"
+      , pinAddress2 = ""
+      , pinCity = "Lathlain"
+      , pinPostcode = "6454"
+      , pinState = "WA"
+      , pinCountry = "AU"
+      }
+  })
