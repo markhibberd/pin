@@ -2,12 +2,64 @@
 module Pin.Data where
 
 import Control.Applicative
+
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Lazy as BL
+import qualified Data.Text.Lazy as LT
+import qualified Data.Text.Lazy.Encoding as LE
+
 import Data.Aeson
 import Data.Aeson.Types
+import Data.Maybe
 import Data.Text
+import Data.Text.Encoding
 import Data.Vector (toList)
 
+import Network.HTTP.Conduit
+
+toParams :: PinRequest -> [(B.ByteString, B.ByteString)]
+toParams pin = [
+      ("amount", fromInt . pinAmount $ pin)
+    , ("description", fromText . pinDescription $ pin)
+    , ("email", fromText . pinEmail $ pin)
+    , ("ip_address", fromText . pinIp $ pin)
+    , ("card[number]", fromText . pinNumber $ pin)
+    , ("card[expiry_month]", fromInt . pinExpiryMonth $ pin)
+    , ("card[expiry_year]", fromInt . pinExpiryYear $ pin)
+    , ("card[cvc]", fromInt . pinCvc $ pin)
+    , ("card[name]", fromText . pinName $ pin)
+    , ("card[address_line1]", fromText . pinAddress1 . pinAddress $ pin)
+    , ("card[address_line2]", fromText . fromMaybe "" . pinAddress2 . pinAddress $ pin)
+    , ("card[address_city]", fromText . pinCity . pinAddress $ pin)
+    , ("card[address_postcode]", fromText . pinPostcode . pinAddress $ pin)
+    , ("card[address_state]", fromText . pinState . pinAddress $ pin)
+    , ("card[address_country]", fromText . pinCountry . pinAddress $ pin)
+    ]
+
+fromInt :: Int -> B.ByteString
+fromInt = fromText . pack . show
+
+fromText :: Text -> B.ByteString
+fromText = encodeUtf8
+
+toText :: BL.ByteString -> Text
+toText = LT.toStrict . LE.decodeUtf8
+
+toStrictBS :: BL.ByteString -> B.ByteString
+toStrictBS = B.concat . BL.toChunks
+
+-- urlEncodedBody params
+
 type PinAmount = Int -- Amount in cents
+
+data PinConfig = PinConfig {
+    pinUrl :: Text
+  , pinApiKey :: Text
+  , pinManagerSettings :: ManagerSettings
+  }
+
+pinApiKeyBS :: PinConfig -> B.ByteString
+pinApiKeyBS = encodeUtf8 . pinApiKey
 
 data PinAddress =
   PinAddress {

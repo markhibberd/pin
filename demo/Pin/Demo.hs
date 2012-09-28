@@ -6,7 +6,7 @@ import Data.Text
 
 demoCharge :: Text -> IO PinResponse
 demoCharge key =
-  charge key (PinRequest {
+  charge (pinTestConfig key) (PinRequest {
       pinAmount = 400
     , pinDescription = "test charge"
     , pinEmail = "roland@pin.net.au"
@@ -28,7 +28,7 @@ demoCharge key =
 
 demoFailure :: Text -> IO PinResponse
 demoFailure key =
-  charge key (PinRequest {
+  charge (pinTestConfig key) (PinRequest {
       pinAmount = 400
     , pinDescription = "test charge"
     , pinEmail = "roland@pin.net.au"
