@@ -21,6 +21,15 @@ charge conf req =
       setHeaders [("Accept", "application/json")]
     ) responder
 
+charge :: PinConfig -> PinRequest -> IO PinResponse
+charge conf req =
+  runRequest (pinManagerSettings conf) (pinUrl conf) (
+      (setApiKey . pinApiKeyBS $ conf) <&>
+      (setParams . toParams $ req) <&>
+      setPost <&>
+      setHeaders [("Accept", "application/json")]
+    ) responder
+
 withJson :: FromJSON a => Int -> BL.ByteString -> (a -> PinResponse) -> PinResponse
 withJson code bs f =
   let bt = toText bs

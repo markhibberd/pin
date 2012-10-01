@@ -72,31 +72,58 @@ data PinAddress =
     }
   deriving (Show)
 
-data PinRequest =
-  PinRequest {
-      pinAmount :: PinAmount
-    , pinDescription :: Text
-    , pinEmail :: Text
-    , pinIp :: Text
-    , pinNumber :: Text
-    , pinExpiryMonth :: Int
-    , pinExpiryYear :: Int
-    , pinCvc :: Int
-    , pinName :: Text
-    , pinAddress :: PinAddress
+
+type PinCustomerToken = Text
+type PinCardToken = Text
+type PinChargeToken = Text
+type PinName = Text
+type PinCurrency = Maybe Text
+type PinEmail = Text
+type PinIp = Text
+type PinMonth = Int
+type PinYear = Int
+type PinCardNumber = Text
+type PinDisplayNumber = Text
+type PinScheme = Text
+type PinCvc = Int
+type PinDate = Text
+
+data PinChargeDetails =
+  PinChargeDetails {
+      pinChargeAmount :: PinAmount
+    , pinChargeDescription :: Text
+    , pinChargeCurrency :: Maybe Text
     }
 
-data PinResponse =
-    PinResponseSuccess {
-        pinResponseToken :: Text
-      , pinResponseResult :: Bool
-      , pinResponseAmount :: PinAmount
-      , pinResponseDescription :: Text
-      , pinResponseEmail :: Text
-      , pinResponseIp :: Text
-      , pinResponseTimestamp :: Text
-      , pinResponseCard :: PinCard
-      }
+data PinCard =
+  PinCard PinCardNumber PinMonth PinYear PinCvc PinName PinAddress
+
+data PinCharge =
+    PinCharge PinCard PinChargeDetails PinEmail PinIp
+  | PinChargeCard PinCardToken PinChargeDetails PinEmail PinIp
+  | PinChargeCustomer PinCustomerToken PinChargeDetails PinEmail
+
+data PinRefund =
+    PinRefund PinChargeToken PinAmount
+
+data PinCreateCard =
+    PinCreateCard PinCard
+
+data PinCreateCustomer =
+    PinCreateCustomer PinEmail PinCard
+  | PinCreateCustomerFromCard PinEmail PinCardToken
+
+data PinDisplayCharge =
+  PinDisplayCharge PinChargeToken Bool PinChargeDetails PinEmail PinIp PinDate (Maybe Text) (Maybe Text) PinDisplayCard -- FIX transfer????
+
+data PinDisplayCard =
+  PinDisplayCard PinCardToken PinDisplayNumber PinScheme PinAddress Bool
+
+data PinCustomerResponse =
+  PinCustomerResponse PinCustomerToken PinEmail PinDate PinDisplayCard
+
+data PinResponse a =
+    PinResponseSuccess a
   | PinResponseUnauthorized
   | PinResponseUnproccessible {
         pinResponseError :: Text
@@ -125,15 +152,6 @@ data PinResponseUnproccessibleData =
     Text
     Text
     [(Text, Text)]
-
-data PinCard =
-  PinCard {
-      pinCardToken :: Text
-    , pinCardDisplayNumber :: Text
-    , pinCardScheme :: Text
-    , pinCardAddress :: PinAddress
-    }
-  deriving (Show)
 
 message :: Value -> Parser (Text, Text)
 message (Object o) = (,) <$> o .: "code" <*> o .: "message"
