@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import Pin.Demo
+import Network.Api.Pin.Demo
 import Data.Text
 import System.Environment
 

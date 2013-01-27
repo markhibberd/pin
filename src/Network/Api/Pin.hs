@@ -7,11 +7,8 @@
 --
 -- Library for pin.net.au HTTP Api
 --
-module Pin (module X) where
+module Network.Api.Pin (module X) where
 
-import Pin.Core as X
-import Pin.Data as X
-import Pin.Defaults as X
-
-
-
+import Network.Api.Pin.Core as X
+import Network.Api.Pin.Data as X
+import Network.Api.Pin.Defaults as X

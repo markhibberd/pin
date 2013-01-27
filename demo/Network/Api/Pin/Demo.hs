@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Pin.Demo where
+module Network.Api.Pin.Demo where
 
-import Pin
+import Network.Api.Pin
 import Data.Text
 
 demoCharge :: Text -> IO PinResponse

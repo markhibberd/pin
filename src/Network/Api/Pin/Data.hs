@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Pin.Data where
+module Network.Api.Pin.Data where
 
 import Control.Applicative
 
@@ -201,3 +201,16 @@ instance FromJSON PinCard where
     <*> o .: "scheme"
     <*> parseJSON o'
   parseJSON _ = fail "Invalid PinCard"
+
+
+syntaxErr :: Int -> BL.ByteString -> Text -> PinResponse
+syntaxErr code body msg = PinResponseJsonSyntaxError code msg (toText body)
+
+formatErr :: Int -> BL.ByteString -> Text -> PinResponse
+formatErr code body msg = PinResponseJsonFormatError code msg (toText body)
+
+successToPinResponse :: PinResponseSuccessData -> PinResponse
+successToPinResponse (PinResponseSuccessData t r a d e ip ts c) = PinResponseSuccess t r a d e ip ts c
+
+unprocessibleToPinResponse :: PinResponseUnproccessibleData -> PinResponse
+unprocessibleToPinResponse (PinResponseUnproccessibleData e d ms) = PinResponseUnproccessible e d ms

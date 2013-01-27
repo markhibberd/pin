@@ -1,4 +1,4 @@
-module Pin.Tests
+module Network.Api.Pin.Tests
   (
     main
   , test
@@ -6,7 +6,7 @@ module Pin.Tests
 
 import Test.Framework
 import Test.Framework.Providers.QuickCheck2 (testProperty)
-import Pin
+import Network.Api.Pin
 
 main ::
   IO ()
@@ -26,4 +26,3 @@ prop_identity ::
   -> Bool
 prop_identity n =
   bletch n == n
-

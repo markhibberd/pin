@@ -1,7 +1,5 @@
 :set -isrc -idist/build/autogen
-:set -Wall 
-:l Pin
-:m + Pin
+:set -Wall
+:l Network.Api.Pin
+:m + Network.Api.Pin
 :set prompt ">> "
-
-
